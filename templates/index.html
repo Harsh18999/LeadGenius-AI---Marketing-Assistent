@@ -8,7 +8,7 @@
 </head>
 
 <body>
-
+    
     <div class="container">
         <h1>Upload a File or Enter Text</h1>
         <form id="uploadForm" action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
@@ -21,18 +21,21 @@
         </form>
         <div id="message"></div>
     </div>
+    
+    <div id="loader" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.7); z-index:9999; justify-content:center; align-items:center;">
+        <div style="font-size:2em;">Loading...</div>
+    </div>
 
     <script>
-        document.getElementById('uploadForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById('message').textContent = result.message || result.error;
-        };
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                document.getElementById('loader').style.display = 'flex';
+          });
+        }
+    });
     </script>
+
 </body>
 </html>

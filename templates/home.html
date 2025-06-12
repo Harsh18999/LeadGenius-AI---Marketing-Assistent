@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LLM Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      {% for domain in domains %}
+        <button class="tab {% if loop.first %}active{% endif %}" onclick="selectTab({{ loop.index }})">{{ domain }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="content-area">
+      <div class="company-details" id="company-details">
+        <h3>Here will be company details for option 1</h3>
+        <p>{{companies_info['netwit.ca']['content']}} </p>
+      </div>
+
+      <div class="chatbot">
+        <p>This is llm based chat-bot</p>
+        <div class="chat-input">
+          <input type="text" id="user-input" placeholder="write you query here">
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectTab(option) {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabs[option - 1].classList.add('active');
+
+      const details = document.getElementById('company-details');
+      details.innerHTML = `<h3>Here will be company details for option ${option}</h3>`;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('user-input');
+      const message = input.value.trim();
+      if (message === "") return;
+
+      alert("Query sent to LLM: " + message);  // Simulated
+      input.value = "";
+    }
+  </script>
+</body>
+</html>

@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import tempfile
 import re
+import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -22,7 +24,7 @@ def index():
 def upload_file():
     file = request.files.get('file')
     text_input = request.form.get('text_input', '').strip()
-
+    
     if file and file.filename != '':
         # Handle file upload
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -32,23 +34,37 @@ def upload_file():
         try:
             try:
                 df = pd.read_csv(temp_file_path)
-                data = df.head().to_dict()
-                return jsonify({'message': 'CSV file uploaded and read successfully', 'data': data})
+                info, domains = get_details_from_dataframe(df)
+                companies_info = {}
+                for domain in domains:
+                    companies_info[domain] = {}
+                return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
+            
             except Exception:
                 with open(temp_file_path, 'r', encoding='utf-8') as f:
                     data = f.read(500)
-                return jsonify({'message': 'Text file uploaded and read successfully', 'data': data})
+                # You can process plain text file here if needed
+                info, domains = get_details_from_text(data)
+                companies_info = {}
+                for domain in domains:
+                    companies_info[domain] = {}
+                    companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
+                return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
         finally:
             os.remove(temp_file_path)
 
     elif text_input:
         # Handle plain text input
-        # Example: just return the first 500 characters
         data = text_input[:500]
         info, domains = get_details_from_text(data) 
-        return jsonify({'message': 'Text input received successfully', 'data': data})
+        companies_info = {}
+        for domain in domains:
+            companies_info[domain] = {}
+            companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
+        return render_template('home.html', info=info, domains=domains, companies_info=companies_info)
+    
     else:
-        return jsonify({'error': 'No file or text input provided'}), 400
+        return render_template('index.html', error='No file or text input provided')
 
 def get_details_from_text(text):
     '''
@@ -162,6 +178,44 @@ def extract_email_info_re(email_string):
         'full_email': full_email
     }
 
+def important_links(soup, base_url):
+    about_links = []
+    for a in soup.find_all('a', href=True):
+        if 'about' in a.text.lower() or 'about' in a['href'].lower() or 'services' in a.text.lower() or 'services' in a['href'].lower() :
+            href = a['href']
+            if not href.startswith('http'):
+                href = base_url.rstrip('/') + '/' + href.lstrip('/')
+            about_links.append(href)
+    return list(set(about_links))  # unique
+
+def scrape_page(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+    res = requests.get(url, headers=headers, timeout=10)
+    soup = BeautifulSoup(res.text, 'html.parser')
+
+    return soup.text
+
+def scrape_company_homepage(domain):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+    url = f"https://{domain}"
+    res = requests.get(url, headers=headers, timeout=10)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    content = []
+    content.append(soup.text)
+
+    important_link = important_links(soup, url)
+
+    for meta_tag in important_link:
+        content.append(scrape_page(meta_tag))
+
+    return {
+        "content": content,
+        "important_links": important_link,
+    }
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
