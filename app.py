@@ -40,16 +40,40 @@ def upload_file():
                 return jsonify({'message': 'Text file uploaded and read successfully', 'data': data})
         finally:
             os.remove(temp_file_path)
-            
+
     elif text_input:
         # Handle plain text input
         # Example: just return the first 500 characters
         data = text_input[:500]
+        info, domains = get_details_from_text(data) 
         return jsonify({'message': 'Text input received successfully', 'data': data})
     else:
         return jsonify({'error': 'No file or text input provided'}), 400
 
+def get_details_from_text(text):
+    '''
+    Extracts first name, last name, and domain from a text input containing email addresses.
+    Args:
+        text (str): Text input containing email addresses.
+    Returns:
+        tuple: A tuple containing:
+            - info (list): List of dictionaries with 'first_name', 'last_name', 'domain', and 'full_email'.
+            - domains (set): Set of unique domains extracted from the email addresses.
+    '''
+    
+    info = []
+    domains = set()
 
+    # Split the text into lines
+    lines = text.splitlines()
+    
+    for line in lines:
+        email_info = extract_email_info_re(line.strip())
+        domains.add(email_info['domain'])
+        info.append(email_info)
+    
+    return info, domains
+    
 def get_details_from_dataframe(data):
     '''
     Extracts first name, last name, and domain from a DataFrame containing email addresses.
@@ -89,6 +113,7 @@ def extract_email_info_re(email_string):
     # Group 3: Username (part before @) - This needs to be added as a group
     # Group 4: Domain (part after @) - This needs to be added as a group
     # Modified regex to capture username and domain as groups 3 and 4
+    
     email_pattern = re.compile(
         r'^(?:"?([^"<]+)"?\s+)?<?(([^@]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}))>?$'
     )
@@ -136,6 +161,7 @@ def extract_email_info_re(email_string):
         'domain': domain,
         'full_email': full_email
     }
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
