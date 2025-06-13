@@ -75,3 +75,11 @@ body {
       border-bottom-right-radius: 6px;
       cursor: pointer;
     }
+
+    .chat-history {
+      max-height: 250px;   /* Adjust as needed */
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }

@@ -1,51 +1,927 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>LLM Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadGenius AI | Marketing Intelligence Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --warning: #f72585;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --sidebar-width: 280px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: #f5f7ff;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: white;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--light-gray);
+      margin-bottom: 20px;
+    }
+
+    .logo i {
+      margin-right: 10px;
+      color: var(--accent);
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0 20px;
+    }
+
+    .nav-menu li {
+      margin-bottom: 5px;
+    }
+
+    .nav-menu a {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      text-decoration: none;
+      color: var(--gray);
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    .nav-menu a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .ai-assistant-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .ai-assistant-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+    }
+
+    .user-profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .user-profile span {
+      font-weight: 500;
+    }
+
+    /* Company Tabs */
+    .tabs-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .company-tabs {
+      display: flex;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      gap: 10px;
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .company-tabs::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    .more-tabs-btn {
+      background-color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 2;
+    }
+
+    .more-tabs-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 300px;
+      overflow-y: auto;
+      width: 200px;
+    }
+
+    .more-tabs-dropdown.show {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+
+    .tab:hover {
+      background-color: var(--light);
+    }
+
+    .tab.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    /* Company Details Card */
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .card-header .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btn {
+      background-color: var(--light);
+      color: var(--gray);
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .action-btn:hover {
+      background-color: var(--light-gray);
+      color: var(--dark);
+    }
+
+    .company-summary {
+      line-height: 1.7;
+      color: var(--dark);
+    }
+
+    .company-summary h3 {
+      font-size: 18px;
+      margin: 20px 0 10px;
+      color: var(--primary);
+    }
+
+    .company-summary p {
+      margin-bottom: 15px;
+    }
+
+    .company-summary ul {
+      padding-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    .company-summary li {
+      margin-bottom: 8px;
+    }
+
+    /* AI Chatbot Popup */
+    .chatbot-popup {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 380px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      transform: translateY(20px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease-out;
+      overflow: hidden;
+    }
+
+    .chatbot-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .chatbot-popup.minimized {
+      height: 60px;
+    }
+
+    .chatbot-header {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: var(--primary);
+      color: white;
+      cursor: pointer;
+    }
+
+    .chatbot-header h2 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-left: 10px;
+      flex: 1;
+    }
+
+    .chatbot-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chatbot-control-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+
+    .chatbot-control-btn:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .chatbot-content {
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      transition: height 0.3s;
+    }
+
+    .chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background-color: var(--light);
+    }
+
+    .message {
+      margin-bottom: 15px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .message-user {
+      text-align: right;
+      margin-left: 20%;
+    }
+
+    .message-bot {
+      text-align: left;
+      margin-right: 20%;
+    }
+
+    .message-content {
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 18px;
+      max-width: 80%;
+      line-height: 1.5;
+    }
+
+    .user-message .message-content {
+      background-color: var(--primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot-message .message-content {
+      background-color: white;
+      color: var(--dark);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-meta {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 5px;
+    }
+
+    .chat-input-container {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      border-top: 1px solid var(--light-gray);
+      background-color: white;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid var(--light-gray);
+      border-radius: 8px;
+      font-family: inherit;
+      resize: none;
+      height: 50px;
+      transition: all 0.3s;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(72, 149, 239, 0.2);
+    }
+
+    .send-btn {
+      width: 50px;
+      height: 50px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .send-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .typing-indicator {
+      display: flex;
+      padding: 10px 15px;
+      background-color: white;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;
+      width: fit-content;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--gray);
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingAnimation {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-width: 70px;
+      }
+
+      .logo span {
+        display: none;
+      }
+
+      .nav-menu a span {
+        display: none;
+      }
+
+      .nav-menu a i {
+        margin-right: 0;
+        font-size: 20px;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+      }
+
+      .chatbot-popup {
+        width: 320px;
+        right: 15px;
+        bottom: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .company-tabs {
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        padding: 8px 15px;
+      }
+
+      .chatbot-popup {
+        width: calc(100% - 30px);
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="tabs">
-      {% for domain in domains %}
-        <button class="tab {% if loop.first %}active{% endif %}" onclick="selectTab({{ loop.index }})">{{ domain }}</button>
-      {% endfor %}
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <a href="#" class="logo">
+      <i class="fas fa-robot"></i>
+      <span>LeadGenius AI</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="#" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+      <li><a href="{{url_for('campaign')}}"><i class="fas fa-envelope"></i><span>Campaigns</span></a></li>
+      <li><a href="#"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
+      <li><a href="#"><i class="fas fa-users"></i><span>Contacts</span></a></li>
+      <li><a href="#"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <header class="header">
+      <h1>Marketing Intelligence Dashboard</h1>
+      <div class="header-actions">
+        <button class="ai-assistant-btn" id="toggleChatbot">
+          <i class="fas fa-robot"></i>
+          <span>AI Assistant</span>
+        </button>
+        <div class="user-profile">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Profile">
+          <span>Sarah Johnson</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Company Tabs -->
+    <div class="tabs-container">
+      <div class="company-tabs" id="companyTabs">
+        <!-- Tabs will be inserted here by JavaScript -->
+      </div>
+      <button class="more-tabs-btn" id="moreTabsBtn">
+        <i class="fas fa-ellipsis-h"></i>
+      </button>
+      <div class="more-tabs-dropdown" id="moreTabsDropdown">
+        <!-- Additional tabs will be inserted here by JavaScript -->
+      </div>
     </div>
 
-    <div class="content-area">
-      <div class="company-details" id="company-details">
-        <h3>Here will be company details for option 1</h3>
-        <p>{{companies_info['netwit.ca']['content']}} </p>
+    <!-- Company Details Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Company Intelligence</h2>
+        <div class="actions">
+          <button class="action-btn" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+          <button class="action-btn" title="Export"><i class="fas fa-download"></i></button>
+        </div>
       </div>
+      <div class="company-summary" id="companyDetails">
+        {% if domains and domains[0] in companies_info and 'summary' in companies_info[domains[0]] %}
+        {{ companies_info[domains[0]]['summary'] | safe }}
+        {% else %}
+        <p>No summary available for the selected company.</p>
+        {% endif %}
+      </div>
+    </div>
 
-      <div class="chatbot">
-        <p>This is llm based chat-bot</p>
-        <div class="chat-input">
-          <input type="text" id="user-input" placeholder="write you query here">
-          <button onclick="sendMessage()">Send</button>
+    <!-- AI Chatbot Popup -->
+    <div class="chatbot-popup" id="chatbotPopup">
+      <div class="chatbot-header" id="chatbotHeader">
+        <i class="fas fa-robot"></i>
+        <h2>AI Marketing Assistant</h2>
+        <div class="chatbot-controls">
+          <button class="chatbot-control-btn" id="minimizeChatbot">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button class="chatbot-control-btn" id="closeChatbot">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="chatbot-content" id="chatbotContent">
+        <div class="chat-history" id="chatHistory">
+          <div class="message bot-message">
+            <div class="message-content">
+              Hello! I'm your AI marketing assistant. How can I help you with your outreach today?
+            </div>
+            <div class="message-meta">Just now</div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <input type="text" class="chat-input" id="userInput" 
+                 placeholder="Ask me anything about the company or outreach strategy..." 
+                 onkeypress="if(event.keyCode === 13) sendMessage()">
+          <button class="send-btn" onclick="sendMessage()">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
-    function selectTab(option) {
-      const tabs = document.querySelectorAll('.tab');
-      tabs.forEach(tab => tab.classList.remove('active'));
-      tabs[option - 1].classList.add('active');
+    const summaries = {{ companies_info | tojson | safe }};
+    const domainList = {{ domains | tojson | safe }};
+    const chatHistory = [{
+      role: "bot",
+      content: "Hello! I'm your AI marketing assistant. How can I help you with your outreach today?",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }];
+    let isBotTyping = false;
+    const maxVisibleTabs = 10;
 
-      const details = document.getElementById('company-details');
-      details.innerHTML = `<h3>Here will be company details for option ${option}</h3>`;
+    // Initialize the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize tabs
+      setupCompanyTabs();
+      
+      // Initialize chatbot popup
+      setupChatbot();
+      
+      // Add smooth transitions when elements appear
+      const elements = document.querySelectorAll('.card, .company-tabs');
+      elements.forEach((el, index) => {
+        setTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+    });
+
+    // Set up company tabs with "more" dropdown
+    function setupCompanyTabs() {
+      const tabsContainer = document.getElementById('companyTabs');
+      const moreDropdown = document.getElementById('moreTabsDropdown');
+      
+      // Clear existing tabs
+      tabsContainer.innerHTML = '';
+      moreDropdown.innerHTML = '';
+      
+      // Create tabs - first maxVisibleTabs in main row, others in dropdown
+      domainList.forEach((domain, index) => {
+        const tab = document.createElement('button');
+        tab.className = `tab ${index === 0 ? 'active' : ''}`;
+        tab.textContent = domain;
+        tab.onclick = () => selectTab(index);
+        
+        if (index < maxVisibleTabs) {
+          tabsContainer.appendChild(tab);
+        } else {
+          moreDropdown.appendChild(tab);
+        }
+      });
+      
+      // Only show "more" button if there are extra tabs
+      const moreTabsBtn = document.getElementById('moreTabsBtn');
+      if (domainList.length > maxVisibleTabs) {
+        moreTabsBtn.style.display = 'flex';
+      } else {
+        moreTabsBtn.style.display = 'none';
+      }
     }
 
-    function sendMessage() {
-      const input = document.getElementById('user-input');
-      const message = input.value.trim();
-      if (message === "") return;
+    // Toggle more tabs dropdown
+    document.getElementById('moreTabsBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('moreTabsDropdown').classList.toggle('show');
+    });
 
-      alert("Query sent to LLM: " + message);  // Simulated
+    // Close dropdown when clicking elsewhere
+    document.addEventListener('click', function() {
+      document.getElementById('moreTabsDropdown').classList.remove('show');
+    });
+
+    // Select company tab
+    function selectTab(index) {
+      // Update active tab in main row
+      const mainTabs = document.querySelectorAll('#companyTabs .tab');
+      mainTabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Update active tab in dropdown
+      const dropdownTabs = document.querySelectorAll('#moreTabsDropdown .tab');
+      dropdownTabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Activate the selected tab (whether it's in main row or dropdown)
+      const domain = domainList[index];
+      const allTabs = [...mainTabs, ...dropdownTabs];
+      const selectedTab = allTabs.find(tab => tab.textContent === domain);
+      if (selectedTab) selectedTab.classList.add('active');
+      
+      // Update company details
+      const summaryHTML = summaries[domain]?.summary || "<p>No summary available for the selected company.</p>";
+      document.getElementById('companyDetails').innerHTML = summaryHTML;
+      
+      // Close dropdown if open
+      document.getElementById('moreTabsDropdown').classList.remove('show');
+    }
+
+    // Set up chatbot popup functionality
+    function setupChatbot() {
+      const toggleBtn = document.getElementById('toggleChatbot');
+      const popup = document.getElementById('chatbotPopup');
+      const minimizeBtn = document.getElementById('minimizeChatbot');
+      const closeBtn = document.getElementById('closeChatbot');
+      const header = document.getElementById('chatbotHeader');
+      const content = document.getElementById('chatbotContent');
+      
+      // Toggle chatbot visibility
+      toggleBtn.addEventListener('click', function() {
+        if (popup.classList.contains('show')) {
+          popup.classList.remove('show');
+        } else {
+          popup.classList.add('show');
+          popup.classList.remove('minimized');
+          content.style.height = '400px';
+        }
+      });
+      
+      // Minimize/maximize chatbot
+      minimizeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        popup.classList.toggle('minimized');
+        content.style.height = popup.classList.contains('minimized') ? '0' : '400px';
+      });
+      
+      // Close chatbot
+      closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        popup.classList.remove('show');
+      });
+      
+      // Toggle minimize/maximize when clicking header
+      header.addEventListener('click', function() {
+        if (popup.classList.contains('minimized')) {
+          popup.classList.remove('minimized');
+          content.style.height = '400px';
+        }
+      });
+    }
+
+    // Send message to chatbot
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      if (message === "" || isBotTyping) return;
+
+      // Add user message to chat
+      const userTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      chatHistory.push({
+        role: "user",
+        content: message,
+        timestamp: userTimestamp
+      });
+      updateChatUI();
       input.value = "";
+
+      // Show typing indicator
+      isBotTyping = true;
+      showTypingIndicator();
+
+      try {
+        const activeTab = document.querySelector('.tab.active');
+        const activeDomain = activeTab ? activeTab.textContent : domainList[0];
+        
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: message,
+            companies_info: summaries,
+            active_domain: activeDomain,
+            chat_history: chatHistory
+          })
+        });
+
+        const data = await response.json();
+        
+        // Remove typing indicator
+        removeTypingIndicator();
+        
+        // Add bot response to chat
+        const botTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        chatHistory.push({
+          role: "bot",
+          content: data.response,
+          timestamp: botTimestamp
+        });
+        
+        updateChatUI();
+      } catch (err) {
+        removeTypingIndicator();
+        const errorTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        chatHistory.push({
+          role: "bot",
+          content: "Sorry, I encountered an error. Please try again later.",
+          timestamp: errorTimestamp
+        });
+        updateChatUI();
+      } finally {
+        isBotTyping = false;
+      }
+    }
+
+    // Update chat UI
+    function updateChatUI() {
+      const container = document.getElementById("chatHistory");
+      container.innerHTML = "";
+      
+      chatHistory.forEach(msg => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${msg.role}-message`;
+        
+        messageDiv.innerHTML = `
+          <div class="message-content">${msg.content}</div>
+          <div class="message-meta">${msg.timestamp}</div>
+        `;
+        
+        container.appendChild(messageDiv);
+      });
+      
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Show typing indicator
+    function showTypingIndicator() {
+      const container = document.getElementById("chatHistory");
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'typing-indicator';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+      container.appendChild(typingDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Remove typing indicator
+    function removeTypingIndicator() {
+      const typingIndicator = document.getElementById('typingIndicator');
+      if (typingIndicator) {
+        typingIndicator.remove();
+      }
     }
   </script>
 </body>

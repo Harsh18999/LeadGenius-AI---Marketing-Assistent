@@ -5,6 +5,8 @@ import tempfile
 import re
 import requests
 from bs4 import BeautifulSoup
+import markdown
+from together import Together
 
 app = Flask(__name__)
 
@@ -50,6 +52,7 @@ def upload_file():
                     companies_info[domain] = {}
                     companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
                 return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
+        
         finally:
             os.remove(temp_file_path)
 
@@ -58,13 +61,72 @@ def upload_file():
         data = text_input[:500]
         info, domains = get_details_from_text(data) 
         companies_info = {}
+
+        # Process each domain to scrape company homepage and generate summaries
         for domain in domains:
             companies_info[domain] = {}
-            companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
-        return render_template('home.html', info=info, domains=domains, companies_info=companies_info)
+            companies_info[domain]['content'] = ' '.join(scrape_company_homepage(domain)['content'])
+
+            summary = get_response_from_llm(
+                prompt = get_summary_prompt(companies_info[domain]['content'])
+            )
+            
+            companies_info[domain]['summary'] = markdown.markdown(summary)
+
+        return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
     
     else:
         return render_template('index.html', error='No file or text input provided')
+
+def get_summary_prompt(content):
+    """
+    Function to generate a summary prompt for the LLM based on the content.
+    This is a placeholder function and should be replaced with actual prompt generation logic.
+
+    Args:
+        content (str): The web content extracted from a company's website.
+    Returns:
+        str: A formatted prompt string for the LLM.
+    """
+    prompt = f'''
+    Given the following web content extracted from a company's website, perform the following tasks:
+
+    1. **About company** — In 2-3 sentences, explain their core business, products/services, or value proposition.
+    2. Start with 2-3 friendly and specific sentences that acknowledge their recent work, mission, or achievements based on the content.
+    3. write in bullet points, Highlight concrete problems, gaps, or growth areas in their digital presence, services, user experience, etc., that can be improved.
+    4.  Offer smart and actionable suggestions to solve or address the above issues (keep them tailored and relevant).
+    5.   Write a short paragraph warning about the negative impact of ignoring these issues (use a professional and persuasive tone).
+
+    Here is the web content:
+    
+    """
+    {content[:29000]}  
+    """
+    Generate the output in clearly labeled sections.
+    '''
+    return prompt
+
+def get_response_from_llm(prompt, system_prompt=None):
+    """
+    Function to get a response from a language model (LLM) using a prompt.
+    Uses Together.ai's LLaMA 3.3 70B Instruct Turbo Free model.
+    """
+
+    # Initialize Together client
+    client = Together(api_key='e5591203825e37070d6117175cb3bd247871954000e6a17659a65833bd33105f')
+
+    # Construct message list
+    messages = [{"role": "user", "content": prompt}]
+    if system_prompt:
+        messages.insert(0, {"role": "system", "content": system_prompt})
+
+    # Call the LLM API
+    response = client.chat.completions.create(
+        model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+        messages=messages
+    )
+
+    return response.choices[0].message.content
 
 def get_details_from_text(text):
     '''
@@ -216,6 +278,87 @@ def scrape_company_homepage(domain):
         "content": content,
         "important_links": important_link,
     }
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    import json
+    data = request.get_json()
+    query = data.get("query")
+    domain = data.get("active_domain").replace('\n', '').replace(' ', '')
+    companies_info = data.get("companies_info", {})
+
+    if not query :
+        return jsonify({"response": "Empty query received."})
+    
+    print(str(domain))
+    system_prompt = get_bot_system_prompt(content=companies_info.get(domain, {}).get('content', ''))
+    # Call Together.ai model
+    try:
+        reply = get_response_from_llm(
+            prompt=query,
+            system_prompt=system_prompt
+        )
+        
+        return jsonify({"response": markdown.markdown(reply)})
+    
+    except Exception as e:
+        print("LLM error:", e)
+        return jsonify({"response": "Sorry, something went wrong while contacting the LLM."})
+
+def get_bot_system_prompt(content):
+    """
+    Function to get the system prompt for the LLM.
+    This is a placeholder function and should be replaced with actual system prompt logic.
+    """
+    prompt =  f"""
+    You are an intelligent assistant that understands company websites. Based on the web scraped content below, answer all queries based on content you have provided about company. 
+
+    content: {content[:29000]}
+
+    Your answers should be clear, concise, and business-focused.
+    """
+    return prompt
+
+@app.route('/generate_email', methods=['POST'])
+def generate_email():
+    data = request.get_json()
+    domain = data.get("domain").replace('\n', '').replace(' ', '')
+    companies_info = data.get("companies_info", {})
+
+    if not domain:
+        return jsonify({"email": "Invalid domain or missing info."})
+    prompt = get_email_system_prompt(content=companies_info.get(domain, {}).get('content', ''))
+    email = get_response_from_llm(prompt)
+    return jsonify({"email": markdown.markdown(email)})
+
+def get_email_system_prompt(content):
+    """
+    Function to get the system prompt for generating an email.
+    This is a placeholder function and should be replaced with actual system prompt logic.
+    """
+    prompt = f"""
+    You are a lead generation and marketing assistant working for NetWit.ca — a company that provides growth and performance services including:
+
+    Social Media Marketing
+  - SEO (Search Engine Optimization)
+  - Content Marketing
+  - Paid Marketing Services
+  - Outdoor Advertising
+  - Cloud Hosting (Shared, Managed, BulletProof VPS)
+  - PowerMTA, Email Warmup, Verification, and SMTP solutions
+  - WordPress Hosting, Guides, Infographics, and Whitepapers
+
+    You are tasked with writing a **highly personalized outreach email** to a company based on their scraped website text below. Parse and understand their business model, tone, and visible issues from the audit.
+
+    Here is the web content of targeted company:
+    {content[:29000]}
+    """
+
+    return prompt
+
+@app.route('/campaign')
+def campaign():
+    return render_template('campaign.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
