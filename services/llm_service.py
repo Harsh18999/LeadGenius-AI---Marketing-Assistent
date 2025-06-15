@@ -19,7 +19,7 @@ def get_bot_system_prompt(content):
     return f"""
     You are an intelligent assistant that understands company websites. Based on the web scraped content below, answer all queries based on content you have provided about company. 
 
-    content: {content[:29000]}
+    content: {content[:28000]}
 
     Your answers should be clear, concise, and business-focused.
     """
@@ -37,7 +37,7 @@ def get_summary_prompt(content):
     Here is the web content:
     
     """
-    {content[:29000]}  
+    {content[:28000]}  
     """
     Generate the output in clearly labeled sections.
     '''
