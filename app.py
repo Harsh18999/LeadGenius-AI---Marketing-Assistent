@@ -6,10 +6,15 @@ from routes.email_routes import email_bp
 from routes.file_routes import file_bp
 from routes.llm_routes import llm_bp
 from routes.other_routes import other_bp
+import os
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    UPLOAD_FOLDER = '/tmp/uploads'
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
     app.config['SESSION_TYPE'] = 'filesystem' 
     # Initialize extensions
     Session(app)
