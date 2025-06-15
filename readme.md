@@ -83,20 +83,6 @@ LeadGenius AI/
 
 ## Troubleshooting
 
-**Common Issues**:
-
-1. **Email sending fails**:
-   - Verify SMTP credentials
-   - Check if "Less secure apps" is enabled for Gmail
-   - Ensure you're using an App Password if 2FA is enabled
-
-2. **Scraping blocked**:
-   - Update the User-Agent in `web_scraper.py`
-   - Add delays between requests if needed
-
-3. **AI responses poor**:
-   - Refine your prompts in `llm_service.py`
-   - Consider using a different model
 
 ## License
 
