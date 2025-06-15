@@ -54,13 +54,13 @@ def extract_email_info_re(email_string):
     }
 
 def get_details_from_dataframe(data):
-    info = []
+    info = {}
     domains = set()
 
     for index, row in data.iterrows():
         email_info = extract_email_info_re(row['email'])
         domains.add(email_info['domain'])
-        info.append(email_info)
+        info[email_info['full_email']] = email_info
     
     return info, domains
 
