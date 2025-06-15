@@ -28,7 +28,7 @@ def upload_file():
                 companies_info = {}
                 for domain in domains:
                     companies_info[domain] = {}
-                    companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
+                    companies_info[domain]['content'] =  ' '.join(scrape_company_homepage(domain)['content'])
                     summary = get_response_from_llm(
                         prompt = get_summary_prompt(companies_info[domain]['content'])
                     )
@@ -44,7 +44,7 @@ def upload_file():
                 companies_info = {}
                 for domain in domains:
                     companies_info[domain] = {}
-                    companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
+                    companies_info[domain]['content'] =  ' '.join(scrape_company_homepage(domain)['content'])
                     summary = get_response_from_llm(
                         prompt = get_summary_prompt(companies_info[domain]['content'])
                     )
