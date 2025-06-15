@@ -1,0 +1,10 @@
+flask==3.0.2
+flask-session==0.8.0
+pandas==2.2.0
+beautifulsoup4==4.12.2
+requests==2.31.0
+markdown==3.5.1
+python-dotenv==1.0.0
+together==0.2.10
+email-validator==2.1.0.post1
+smtplib==0.0.1
