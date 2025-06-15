@@ -1,7 +1,7 @@
 from together import Together
 from config import Config
 
-client = Together(api_key=Config.TOGETHER_API_KEY)
+client = Together()
 
 def get_response_from_llm(prompt, system_prompt=None):
     messages = [{"role": "user", "content": prompt}]
