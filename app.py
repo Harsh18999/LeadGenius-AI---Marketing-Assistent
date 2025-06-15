@@ -11,11 +11,16 @@ import os
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    UPLOAD_FOLDER = '/tmp/uploads'
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-    app.config['SESSION_TYPE'] = 'filesystem' 
+    app.config['SESSION_TYPE'] = 'redis' 
+    app.config['SESSION_PERMANENT'] = False
+    app.config['SESSION_USE_SIGNER'] = False
+    app.config['SESSION_REDIS'] = redis.Redis(
+    host='redis-15273.c264.ap-south-1-1.ec2.redns.redis-cloud.com',
+    port=15273,
+    decode_responses=False,
+    username="default",
+    password=os.environ['REDIC_KEY],
+)
     # Initialize extensions
     Session(app)
     Config.init_app(app)
