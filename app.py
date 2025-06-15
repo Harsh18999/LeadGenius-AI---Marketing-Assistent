@@ -6,6 +6,7 @@ from routes.email_routes import email_bp
 from routes.file_routes import file_bp
 from routes.llm_routes import llm_bp
 from routes.other_routes import other_bp
+import redis
 import os
 
 def create_app():
