@@ -9,4 +9,5 @@ email-validator==2.1.0
 flask-debugtoolbar==0.13.1  # Debugging
 pytest==8.0.0  # Testing
 Flask==3.0.3
+redis==6.2.0
 gunicorn==21.2.0
