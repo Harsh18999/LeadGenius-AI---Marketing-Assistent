@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,524 +7,7 @@
   <title>LeadGenius AI | Campaign Management</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #4361ee;
-      --primary-dark: #3a56d4;
-      --secondary: #3f37c9;
-      --accent: #4895ef;
-      --light: #f8f9fa;
-      --dark: #212529;
-      --success: #4cc9f0;
-      --warning: #f72585;
-      --gray: #6c757d;
-      --light-gray: #e9ecef;
-      --sidebar-width: 280px;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      line-height: 1.6;
-      color: var(--dark);
-      background-color: #f5f7ff;
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* Sidebar Navigation */
-    .sidebar {
-      width: var(--sidebar-width);
-      background-color: white;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px 0;
-      position: fixed;
-      height: 100vh;
-      z-index: 100;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary);
-      text-decoration: none;
-      padding: 0 20px 20px;
-      border-bottom: 1px solid var(--light-gray);
-      margin-bottom: 20px;
-    }
-
-    .logo i {
-      margin-right: 10px;
-      color: var(--accent);
-    }
-
-    .nav-menu {
-      list-style: none;
-      padding: 0 20px;
-    }
-
-    .nav-menu li {
-      margin-bottom: 5px;
-    }
-
-    .nav-menu a {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      text-decoration: none;
-      color: var(--gray);
-      border-radius: 5px;
-      transition: all 0.3s;
-    }
-
-    .nav-menu a:hover,
-    .nav-menu a.active {
-      background-color: rgba(67, 97, 238, 0.1);
-      color: var(--primary);
-    }
-
-    .nav-menu a i {
-      margin-right: 10px;
-      width: 20px;
-      text-align: center;
-    }
-
-    /* Main Content Area */
-    .main-content {
-      flex: 1;
-      margin-left: var(--sidebar-width);
-      padding: 20px;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: white;
-      padding: 15px 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--dark);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .ai-assistant-btn {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s;
-    }
-
-    .ai-assistant-btn:hover {
-      background-color: var(--primary-dark);
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-    }
-
-    .user-profile img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .user-profile span {
-      font-weight: 500;
-    }
-
-    /* Campaign Controls */
-    .campaign-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      background-color: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .campaign-title {
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .campaign-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .campaign-btn {
-      padding: 8px 15px;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-      transition: all 0.3s;
-    }
-
-    .primary-btn {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .primary-btn:hover {
-      background-color: var(--primary-dark);
-    }
-
-    .secondary-btn {
-      background-color: var(--light);
-      color: var(--dark);
-    }
-
-    .secondary-btn:hover {
-      background-color: var(--light-gray);
-    }
-
-    /* Campaign Table */
-    .campaign-table-container {
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-    }
-
-    .table-header {
-      display: grid;
-      grid-template-columns: 40px 2fr 2fr 2fr 1fr 1fr 1fr;
-      padding: 15px 20px;
-      background-color: var(--light);
-      font-weight: 600;
-      border-bottom: 1px solid var(--light-gray);
-    }
-
-    .table-row {
-      display: grid;
-      grid-template-columns: 40px 2fr 2fr 2fr 1fr 1fr 1fr;
-      padding: 15px 20px;
-      align-items: center;
-      border-bottom: 1px solid var(--light-gray);
-      transition: all 0.3s;
-      animation: fadeIn 0.5s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .table-row:hover {
-      background-color: rgba(67, 97, 238, 0.05);
-    }
-
-    .table-row:last-child {
-      border-bottom: none;
-    }
-
-    .checkbox-cell {
-      display: flex;
-      justify-content: center;
-    }
-
-    .checkbox-cell input {
-      cursor: pointer;
-    }
-
-    .status-cell {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .status-pending {
-      background-color: #fff3cd;
-      color: #856404;
-    }
-
-    .status-sent {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .status-failed {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
-    .action-cell {
-      display: flex;
-      gap: 8px;
-    }
-
-    .action-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: none;
-      background-color: var(--light);
-      color: var(--gray);
-    }
-
-    .action-btn:hover {
-      background-color: var(--light-gray);
-      color: var(--dark);
-    }
-
-    .send-btn {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .send-btn:hover {
-      background-color: var(--primary-dark);
-    }
-
-    /* Email Template Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-    }
-
-    .modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .email-modal {
-      background-color: white;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 900px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(20px);
-      transition: all 0.3s;
-    }
-
-    .modal-overlay.show .email-modal {
-      transform: translateY(0);
-    }
-
-    .modal-header {
-      padding: 15px 20px;
-      border-bottom: 1px solid var(--light-gray);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: var(--gray);
-    }
-
-    .modal-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .email-form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .email-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .email-recipient {
-      font-weight: 500;
-    }
-
-    .generate-btn {
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s;
-    }
-
-    .generate-btn:hover {
-      background-color: #3a7bc8;
-    }
-
-    .email-subject {
-      width: 100%;
-      padding: 10px 15px;
-      border: 1px solid var(--light-gray);
-      border-radius: 5px;
-      font-family: inherit;
-    }
-
-    .email-subject:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .email-body {
-      width: 100%;
-      min-height: 300px;
-      padding: 15px;
-      border: 1px solid var(--light-gray);
-      border-radius: 5px;
-      font-family: inherit;
-      line-height: 1.6;
-      resize: vertical;
-    }
-
-    .email-body:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .modal-footer {
-      padding: 15px 20px;
-      border-top: 1px solid var(--light-gray);
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 1200px) {
-      .table-header, .table-row {
-        grid-template-columns: 40px 1.5fr 1.5fr 1fr 1fr 1fr;
-      }
-      .email-cell {
-        display: none;
-      }
-    }
-
-    @media (max-width: 992px) {
-      .table-header, .table-row {
-        grid-template-columns: 40px 2fr 1fr 1fr;
-      }
-      .name-cell, .status-cell {
-        display: none;
-      }
-    }
-
-    @media (max-width: 768px) {
-      :root {
-        --sidebar-width: 70px;
-      }
-
-      .logo span {
-        display: none;
-      }
-
-      .nav-menu a span {
-        display: none;
-      }
-
-      .nav-menu a i {
-        margin-right: 0;
-        font-size: 20px;
-      }
-
-      .main-content {
-        margin-left: var(--sidebar-width);
-      }
-
-      .campaign-controls {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-      }
-
-      .table-header, .table-row {
-        grid-template-columns: 40px 2fr 1fr;
-      }
-      .template-cell {
-        display: none;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .table-header, .table-row {
-        grid-template-columns: 40px 1fr;
-        padding: 10px;
-      }
-      .action-cell {
-        display: none;
-      }
-
-      .email-modal {
-        width: 95%;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='campaign.css') }}">
 </head>
 
 <body>
@@ -535,11 +18,8 @@
       <span>LeadGenius AI</span>
     </a>
     <ul class="nav-menu">
-      <li><a href="#"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-      <li><a href="#" class="active"><i class="fas fa-envelope"></i><span>Campaigns</span></a></li>
-      <li><a href="#"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
-      <li><a href="#"><i class="fas fa-users"></i><span>Contacts</span></a></li>
-      <li><a href="#"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+      <li><a href="{{url_for('file.dashboard')}}" ><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+      <li><a href="{{url_for('file.campaign')}}" class="active" ><i class="fas fa-envelope"></i><span>Campaigns</span></a></li>
     </ul>
   </aside>
 
@@ -548,32 +28,35 @@
     <header class="header">
       <h1>Email Outreach Campaign</h1>
       <div class="header-actions">
-        <button class="ai-assistant-btn" id="toggleChatbot">
-          <i class="fas fa-robot"></i>
-          <span>AI Assistant</span>
-        </button>
         <div class="user-profile">
-          <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Profile">
-          <span>Sarah Johnson</span>
+          <img src="{{ url_for('static', filename='profile_img.jpg') }}" alt="User Profile">
+          <span>Harsh Kumar</span>
         </div>
       </div>
     </header>
 
     <!-- Campaign Controls -->
     <div class="campaign-controls">
-      <div class="campaign-title">Tech Startup Outreach - Q3 2023</div>
       <div class="campaign-actions">
-        <button class="campaign-btn secondary-btn">
+        <button class="campaign-btn secondary-btn" id="filterBtn">
           <i class="fas fa-filter"></i>
           <span>Filter</span>
         </button>
-        <button class="campaign-btn secondary-btn">
+        <button class="campaign-btn secondary-btn" id="exportBtn">
           <i class="fas fa-download"></i>
           <span>Export</span>
         </button>
-        <button class="campaign-btn primary-btn">
+        <button class="campaign-btn primary-btn" id="addLeadsBtn">
           <i class="fas fa-plus"></i>
           <span>Add Leads</span>
+        </button>
+        <button class="campaign-btn danger-btn" id="deleteSelectedBtn">
+          <i class="fas fa-trash"></i>
+          <span>Delete Selected</span>
+        </button>
+        <button class="campaign-btn success-btn" id="sendSelectedBtn">
+          <i class="fas fa-paper-plane"></i>
+          <span>Send Selected</span>
         </button>
       </div>
     </div>
@@ -592,115 +75,56 @@
       </div>
 
       <!-- Table Rows - These would be dynamically generated in a real app -->
-      <div class="table-row">
+      {% for email in info %}
+      <div class="table-row" data-email="{{ email }}" data-status="{{ info[email]['status'].lower() }}">
         <div class="checkbox-cell">
-          <input type="checkbox">
+          <input type="checkbox" class="row-checkbox">
         </div>
-        <div class="name-cell">Alex Johnson</div>
-        <div class="email-cell">alex.johnson@startup.io</div>
+        <div class="name-cell">{{ info[email]['first_name'] + ' ' + info[email]['last_name'] }}</div>
+        <div class="email-cell">{{ email }}</div>
         <div class="template-cell">
-          <a href="#" class="template-link" data-email="alex.johnson@startup.io" data-name="Alex Johnson">Cold Outreach Template</a>
+          <a href="#" class="template-link" data-email="{{ email }}" data-name="{{ info[email]['first_name'] + ' ' + info[email]['last_name'] }}">Edit Draft</a>
         </div>
         <div class="status-cell">
-          <span class="status-badge status-pending">Pending</span>
+          <span class="status-badge status-{{ info[email]['status'].lower() }}">{{ info[email]['status'] }}</span>
         </div>
         <div class="action-cell">
-          <button class="action-btn send-btn" title="Send Email">
+          <button class="action-btn send-btn" title="Send Email" data-email="{{ email }}">
             <i class="fas fa-paper-plane"></i>
           </button>
-          <button class="action-btn" title="Edit">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="action-btn" title="Delete">
+          <button class="action-btn delete-btn" title="Delete" data-email="{{ email }}">
             <i class="fas fa-trash"></i>
           </button>
         </div>
       </div>
+      {% endfor %}
+    </div>
 
-      <div class="table-row">
-        <div class="checkbox-cell">
-          <input type="checkbox">
+    <!-- Add Leads Modal -->
+    <div class="modal-overlay" id="addLeadsModal">
+      <div class="add-leads-modal">
+        <div class="modal-header">
+          <div class="modal-title">Add New Leads</div>
+          <button class="modal-close" id="closeAddLeadsModal">&times;</button>
         </div>
-        <div class="name-cell">Maria Garcia</div>
-        <div class="email-cell">maria.garcia@techcorp.com</div>
-        <div class="template-cell">
-          <a href="#" class="template-link" data-email="maria.garcia@techcorp.com" data-name="Maria Garcia">Partnership Proposal</a>
+        <div class="modal-content">
+          <form class="add-leads-form" id="addLeadsForm">
+            <div class="form-group">
+              <label for="leadsData">Paste leads data (CSV or JSON format):</label>
+              <textarea id="leadsData" class="leads-data-input" placeholder="First Name,Last Name,Email,Company..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="leadsFile">Or upload file:</label>
+              <input type="file" id="leadsFile" accept=".csv,.json,.txt">
+            </div>
+          </form>
         </div>
-        <div class="status-cell">
-          <span class="status-badge status-sent">Sent</span>
-        </div>
-        <div class="action-cell">
-          <button class="action-btn" title="View">
-            <i class="fas fa-eye"></i>
+        <div class="modal-footer">
+          <button class="campaign-btn secondary-btn" id="cancelAddLeads">
+            Cancel
           </button>
-          <button class="action-btn" title="Resend">
-            <i class="fas fa-redo"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="table-row">
-        <div class="checkbox-cell">
-          <input type="checkbox">
-        </div>
-        <div class="name-cell">David Kim</div>
-        <div class="email-cell">david.kim@innovate.ai</div>
-        <div class="template-cell">
-          <a href="#" class="template-link" data-email="david.kim@innovate.ai" data-name="David Kim">Follow-up Template</a>
-        </div>
-        <div class="status-cell">
-          <span class="status-badge status-failed">Failed</span>
-        </div>
-        <div class="action-cell">
-          <button class="action-btn send-btn" title="Resend">
-            <i class="fas fa-paper-plane"></i>
-          </button>
-          <button class="action-btn" title="Edit">
-            <i class="fas fa-edit"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="table-row">
-        <div class="checkbox-cell">
-          <input type="checkbox">
-        </div>
-        <div class="name-cell">Sarah Williams</div>
-        <div class="email-cell">sarah.w@digitalhub.com</div>
-        <div class="template-cell">
-          <a href="#" class="template-link" data-email="sarah.w@digitalhub.com" data-name="Sarah Williams">Cold Outreach Template</a>
-        </div>
-        <div class="status-cell">
-          <span class="status-badge status-pending">Pending</span>
-        </div>
-        <div class="action-cell">
-          <button class="action-btn send-btn" title="Send Email">
-            <i class="fas fa-paper-plane"></i>
-          </button>
-          <button class="action-btn" title="Edit">
-            <i class="fas fa-edit"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="table-row">
-        <div class="checkbox-cell">
-          <input type="checkbox">
-        </div>
-        <div class="name-cell">James Wilson</div>
-        <div class="email-cell">james.wilson@cloudnine.io</div>
-        <div class="template-cell">
-          <a href="#" class="template-link" data-email="james.wilson@cloudnine.io" data-name="James Wilson">Product Demo Invite</a>
-        </div>
-        <div class="status-cell">
-          <span class="status-badge status-sent">Sent</span>
-        </div>
-        <div class="action-cell">
-          <button class="action-btn" title="View">
-            <i class="fas fa-eye"></i>
-          </button>
-          <button class="action-btn" title="Follow-up">
-            <i class="fas fa-reply"></i>
+          <button class="campaign-btn primary-btn" id="submitLeads">
+            Add Leads
           </button>
         </div>
       </div>
@@ -722,22 +146,9 @@
                 Generate Personalized Outreach
               </button>
             </div>
+            <input type="hidden" id="currentRecipientEmail">
             <input type="text" class="email-subject" id="emailSubject" placeholder="Subject" value="Exploring Partnership Opportunities">
-            <textarea class="email-body" id="emailBody" placeholder="Write your email here...">
-Hi Alex,
-
-I hope this message finds you well. I came across Startup.io and was impressed by your innovative approach to solving [specific problem].
-
-At [Your Company], we specialize in [your value proposition] and believe there could be a strong synergy between our companies. 
-
-I'd love to schedule a quick call to explore potential collaboration opportunities. Would you be available for a 15-minute chat next week?
-
-Looking forward to your thoughts.
-
-Best regards,
-Sarah Johnson
-LeadGenius AI
-            </textarea>
+            <textarea class="email-body" id="emailBody" placeholder="Write your email here..."></textarea>
           </form>
         </div>
         <div class="modal-footer">
@@ -752,6 +163,9 @@ LeadGenius AI
         </div>
       </div>
     </div>
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
   </main>
 
   <script>
@@ -777,11 +191,19 @@ LeadGenius AI
 
       // Close modal when close button is clicked
       document.getElementById('closeModal').addEventListener('click', closeEmailModal);
+      document.getElementById('closeAddLeadsModal').addEventListener('click', closeAddLeadsModal);
+      document.getElementById('cancelAddLeads').addEventListener('click', closeAddLeadsModal);
 
       // Close modal when clicking outside
       document.getElementById('emailModal').addEventListener('click', function(e) {
         if (e.target === this) {
           closeEmailModal();
+        }
+      });
+
+      document.getElementById('addLeadsModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeAddLeadsModal();
         }
       });
 
@@ -794,6 +216,32 @@ LeadGenius AI
       // Save draft
       document.getElementById('saveDraft').addEventListener('click', saveDraft);
 
+      // Add leads button
+      document.getElementById('addLeadsBtn').addEventListener('click', openAddLeadsModal);
+      document.getElementById('submitLeads').addEventListener('click', submitLeads);
+
+      // Delete selected
+      document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
+
+      // Send selected
+      document.getElementById('sendSelectedBtn').addEventListener('click', sendSelected);
+
+      // Individual send buttons
+      document.querySelectorAll('.send-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const email = this.getAttribute('data-email');
+          sendSingleEmail(email);
+        });
+      });
+
+      // Individual delete buttons
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const email = this.getAttribute('data-email');
+          deleteSingleLead(email);
+        });
+      });
+
       // Add animation to table rows
       animateTableRows();
     });
@@ -801,14 +249,54 @@ LeadGenius AI
     function openEmailModal(email, name) {
       const modal = document.getElementById('emailModal');
       const recipientInfo = document.getElementById('recipientInfo');
-      
+      const emailField = document.getElementById('currentRecipientEmail');
+      const subjectField = document.getElementById('emailSubject');
+      const bodyField = document.getElementById('emailBody');
+
       recipientInfo.textContent = `To: ${name} <${email}>`;
+      emailField.value = email;
       modal.classList.add('show');
       document.body.style.overflow = 'hidden';
+
+      // Call Flask backend to get email 
+      fetch('/get_email_draft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({
+          email: email
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          subjectField.value = data.subject;
+          bodyField.value = data.body;
+        } else {
+          showToast('Failed to get email: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error generating email: ' + error, 'error');
+      })
     }
 
     function closeEmailModal() {
       const modal = document.getElementById('emailModal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function openAddLeadsModal() {
+      const modal = document.getElementById('addLeadsModal');
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAddLeadsModal() {
+      const modal = document.getElementById('addLeadsModal');
       modal.classList.remove('show');
       document.body.style.overflow = '';
     }
@@ -818,6 +306,7 @@ LeadGenius AI
       const bodyField = document.getElementById('emailBody');
       const recipientInfo = document.getElementById('recipientInfo').textContent;
       const name = recipientInfo.split(' <')[0].replace('To: ', '');
+      const email = document.getElementById('currentRecipientEmail').value;
       
       // Show loading state
       const generateBtn = document.getElementById('generateEmail');
@@ -825,48 +314,39 @@ LeadGenius AI
       generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
       generateBtn.disabled = true;
       
-      // Simulate API call to generate email
-      setTimeout(() => {
-        // This would be replaced with actual API call to your email generation service
-        const personalizedEmail = generateEmailContent(name);
-        
-        subjectField.value = personalizedEmail.subject;
-        bodyField.value = personalizedEmail.body;
-        
-        // Restore button state
+      // Call Flask backend to generate email using LLM
+      fetch('/generate_email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          subjectField.value = data.email.subject;
+          bodyField.value = data.email.body;
+          showToast('Personalized email generated successfully!');
+        } else {
+          showToast('Failed to generate email: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error generating email: ' + error, 'error');
+      })
+      .finally(() => {
         generateBtn.innerHTML = originalText;
         generateBtn.disabled = false;
-        
-        // Show success message
-        showToast('Personalized email generated successfully!');
-      }, 1500);
-    }
-
-    function generateEmailContent(name) {
-      // In a real app, this would call your AI email generation API
-      // This is just a simulation with template content
-      const templates = [
-        {
-          subject: `Quick question about your work at ${name.split(' ')[0]}'s company`,
-          body: `Hi ${name.split(' ')[0]},\n\nI came across your profile and was impressed by your experience in [industry/field]. At [Your Company], we're working on [brief description] and I'd love to get your perspective.\n\nWould you be open to a quick 15-minute call next week to share your insights?\n\nLooking forward to your thoughts.\n\nBest regards,\n[Your Name]`
-        },
-        {
-          subject: `Potential collaboration between ${name.split(' ')[0]}'s company and ours`,
-          body: `Dear ${name.split(' ')[0]},\n\nI've been following the great work your team at [Company] has been doing with [specific project/product]. It aligns closely with what we're building at [Your Company].\n\nI'd love to explore if there might be opportunities for us to collaborate or share knowledge. Are you available for a brief conversation in the coming days?\n\nThanks for considering this, and keep up the great work!\n\nBest,\n[Your Name]`
-        },
-        {
-          subject: `Congrats on your recent achievement, ${name.split(' ')[0]}!`,
-          body: `Hi ${name.split(' ')[0]},\n\nI just saw [specific achievement/news] and wanted to reach out to congratulate you! That's an impressive milestone.\n\nI'm reaching out because at [Your Company], we're working on [related work] and I think there might be some interesting synergies between what we're doing.\n\nWould you be open to connecting for a quick chat? I'd love to learn more about your work and share what we're building.\n\nEither way, congrats again!\n\nBest,\n[Your Name]`
-        }
-      ];
-      
-      return templates[Math.floor(Math.random() * templates.length)];
+      });
     }
 
     function sendEmail() {
-      const subject = document.getElementById('emailSubject').value;
-      const body = document.getElementById('emailBody').value;
-      const recipientInfo = document.getElementById('recipientInfo').textContent;
+      const email = document.getElementById('currentRecipientEmail').value;
       
       if (!subject || !body) {
         showToast('Please fill in all fields before sending', 'error');
@@ -879,62 +359,319 @@ LeadGenius AI
       sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
       sendBtn.disabled = true;
       
-      // Simulate API call to send email
-      setTimeout(() => {
-        // In a real app, this would call your email sending API
-        console.log('Email sent to:', recipientInfo);
-        console.log('Subject:', subject);
-        console.log('Body:', body);
-        
-        // Restore button state
+      // Call Flask backend to send email
+      fetch('/send_email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({
+          email: email
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Email sent successfully!');
+          closeEmailModal();
+          updateEmailStatus(email, 'sent');
+        } else {
+          showToast('Failed to send email: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error sending email: ' + error, 'error');
+      })
+      .finally(() => {
         sendBtn.innerHTML = originalText;
         sendBtn.disabled = false;
-        
-        // Show success message and close modal
-        showToast('Email sent successfully!');
-        closeEmailModal();
-        
-        // Update status in the table (in a real app, this would update the actual data)
-        updateEmailStatus(recipientInfo, 'sent');
-      }, 1000);
+      });
+    }
+
+    function sendSingleEmail(email) {
+      if (!confirm(`Send email to ${email}?`)) return;
+      
+      // Find the row and get the name
+      const row = document.querySelector(`.table-row[data-email="${email}"]`);
+      const name = row.querySelector('.name-cell').textContent;
+      console.log(email)
+
+      // Call send email function
+      fetch('/send_email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+          },
+          body: JSON.stringify({
+              email:email
+            })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`Email sent to ${email} successfully!`);
+          updateEmailStatus(email, 'sent');
+        } else {
+          throw new Error(data.error || 'Failed to send email');
+        }
+      })
+      .catch(error => {
+        showToast(`Error sending to ${email}: ${error}`, 'error');
+      });
     }
 
     function saveDraft() {
       const subject = document.getElementById('emailSubject').value;
       const body = document.getElementById('emailBody').value;
+      const email = document.getElementById('currentRecipientEmail').value;
       
       if (!subject || !body) {
         showToast('Please fill in all fields before saving', 'error');
         return;
       }
       
-      // In a real app, this would save to your database
-      console.log('Draft saved:', { subject, body });
-      showToast('Draft saved successfully!');
-      closeEmailModal();
+      // Call Flask backend to save draft
+      fetch('/save_draft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({
+          email: email,
+          subject: subject,
+          body: body
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Draft saved successfully!');
+          closeEmailModal();
+          updateEmailStatus(email, 'pending');
+        } else {
+          showToast('Failed to save draft: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error saving draft: ' + error, 'error');
+      });
     }
 
-    function updateEmailStatus(recipientInfo, status) {
-      // In a real app, this would update your data store
-      // This is just a UI simulation
-      const email = recipientInfo.match(/<(.+)>/)[1];
-      const rows = document.querySelectorAll('.table-row');
+    function submitLeads() {
+      const leadsData = document.getElementById('leadsData').value;
+      const fileInput = document.getElementById('leadsFile');
       
-      rows.forEach(row => {
-        const rowEmail = row.querySelector('.email-cell')?.textContent;
-        if (rowEmail === email) {
-          const statusBadge = row.querySelector('.status-badge');
-          if (statusBadge) {
-            statusBadge.className = 'status-badge ' + `status-${status}`;
-            statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-          }
+      if (!leadsData && !fileInput.files.length) {
+        showToast('Please provide leads data or upload a file', 'error');
+        return;
+      }
+      
+      const formData = new FormData();
+      if (fileInput.files.length) {
+        formData.append('file', fileInput.files[0]);
+      }
+      if (leadsData) {
+        formData.append('leads_data', leadsData);
+      }
+      
+      // Show loading state
+      const submitBtn = document.getElementById('submitLeads');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      submitBtn.disabled = true;
+      
+      // Call Flask backend to add leads
+      fetch('/add_leads', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`${data.count} leads added successfully!`);
+          closeAddLeadsModal();
+          // Reload the page to show new leads
+          location.reload();
+        } else {
+          showToast('Failed to add leads: ' + data.error, 'error');
         }
+      })
+      .catch(error => {
+        showToast('Error adding leads: ' + error, 'error');
+      })
+      .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      });
+    }
+
+    function deleteSelected() {
+      const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+      if (selectedCheckboxes.length === 0) {
+        showToast('Please select at least one lead to delete', 'error');
+        return;
+      }
+      
+      const emails = Array.from(selectedCheckboxes).map(checkbox => {
+        return checkbox.closest('.table-row').getAttribute('data-email');
+      });
+      
+      if (!confirm(`Delete ${emails.length} selected leads?`)) return;
+      
+      // Call Flask backend to delete leads
+      fetch('/delete_leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({ emails: emails })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`${emails.length} leads deleted successfully!`);
+          // Reload the page to reflect changes
+          location.reload();
+        } else {
+          showToast('Failed to delete leads: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error deleting leads: ' + error, 'error');
+      });
+    }
+
+    function deleteSingleLead(email) {
+      if (!confirm(`Delete lead ${email}?`)) return;
+      
+      // Call Flask backend to delete lead
+      fetch('/delete_leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({ emails: [email] })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Lead deleted successfully!');
+          // Remove the row from the table
+          document.querySelector(`.table-row[data-email="${email}"]`).remove();
+        } else {
+          showToast('Failed to delete lead: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error deleting lead: ' + error, 'error');
+      });
+    }
+
+    function sendSelected() {
+      const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+      if (selectedCheckboxes.length === 0) {
+        showToast('Please select at least one lead to send', 'error');
+        return;
+      }
+      
+      const emails = Array.from(selectedCheckboxes).map(checkbox => {
+        return checkbox.closest('.table-row').getAttribute('data-email');
+      });
+      
+      if (!confirm(`Send emails to ${emails.length} selected leads?`)) return;
+      
+      // Show loading state
+      const sendBtn = document.getElementById('sendSelectedBtn');
+      const originalText = sendBtn.innerHTML;
+      sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      sendBtn.disabled = true;
+      
+      // Call Flask backend to send bulk emails
+      fetch('/send_bulk_emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({ emails: emails })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`${data.sent_count} emails sent successfully!`);
+          // Update status for all sent emails
+          emails.forEach(email => {
+            updateEmailStatus(email, 'sent');
+          });
+        } else {
+          showToast(`Sent ${data.sent_count || 0} emails, failed ${data.failed_count || emails.length}: ${data.error}`, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error sending emails: ' + error, 'error');
+      })
+      .finally(() => {
+        sendBtn.innerHTML = originalText;
+        sendBtn.disabled = false;
+      });
+    }
+
+    function updateEmailStatus(email, status) {
+
+      fetch('/update_email_status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+        },
+        body: JSON.stringify({
+          email: email,
+          status: status
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const row = document.querySelector(`.table-row[data-email="${email}"]`);
+          showToast(`Email status updated to ${status}`);
+          if (row) {
+            row.setAttribute('data-status', status);
+            const statusBadge = row.querySelector('.status-badge');
+            if (statusBadge) {
+              statusBadge.className = 'status-badge ' + `status-${status}`;
+              statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            }
+          }
+        } else {
+          showToast('Failed to update email status: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error updating email status: ' + error, 'error');
       });
     }
 
     function showToast(message, type = 'success') {
-      // In a real app, you'd have a proper toast notification system
-      alert(message);
+      const container = document.getElementById('toast-container');
+  
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+
+      container.appendChild(toast);
+
+      // Remove toast after animation (3s)
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
     }
 
     function animateTableRows() {

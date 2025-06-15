@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import os
 import pandas as pd
 import tempfile
@@ -6,9 +6,17 @@ import re
 import requests
 from bs4 import BeautifulSoup
 import markdown
+import json
 from together import Together
+from flask_session import Session
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
+app.secret_key = 'xyz'  # Keep this safe!
+app.config['SESSION_TYPE'] = 'filesystem'  # alternatives: 'redis', 'memcached', etc.
+Session(app)
 
 # Set the upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -36,11 +44,14 @@ def upload_file():
         try:
             try:
                 df = pd.read_csv(temp_file_path)
-                info, domains = get_details_from_dataframe(df)
+                info,  domains = get_details_from_dataframe(df)
+                session['info'] = info
+                session['domains'] = list(domains)
                 companies_info = {}
                 for domain in domains:
                     companies_info[domain] = {}
-                return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
+                session['companies_info'] = companies_info
+                return render_template('dashboard.html', info=info, domains=list(domains), companies_info=companies_info)
             
             except Exception:
                 with open(temp_file_path, 'r', encoding='utf-8') as f:
@@ -51,7 +62,12 @@ def upload_file():
                 for domain in domains:
                     companies_info[domain] = {}
                     companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
-                return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
+                
+                session['info'] = info
+                session['domains'] = list(domains)
+                session['companies_info'] = companies_info
+
+                return render_template('dashboard.html', info=info, domains=list(domains), companies_info=companies_info)
         
         finally:
             os.remove(temp_file_path)
@@ -72,8 +88,11 @@ def upload_file():
             )
             
             companies_info[domain]['summary'] = markdown.markdown(summary)
-
-        return render_template('home.html', info=info, domains=list(domains), companies_info=companies_info)
+            
+        session['info'] = info
+        session['domains'] = list(domains)
+        session['companies_info'] = companies_info
+        return render_template('dashboard.html', info=info, domains=list(domains), companies_info=companies_info)
     
     else:
         return render_template('index.html', error='No file or text input provided')
@@ -139,7 +158,7 @@ def get_details_from_text(text):
             - domains (set): Set of unique domains extracted from the email addresses.
     '''
     
-    info = []
+    info = {}
     domains = set()
 
     # Split the text into lines
@@ -148,7 +167,7 @@ def get_details_from_text(text):
     for line in lines:
         email_info = extract_email_info_re(line.strip())
         domains.add(email_info['domain'])
-        info.append(email_info)
+        info[email_info['full_email']] = email_info
     
     return info, domains
     
@@ -200,10 +219,11 @@ def extract_email_info_re(email_string):
 
     if not match:
         return {
-            'first_name': None,
-            'last_name': None,
-            'domain': None,
-            'full_email': None
+            'first_name': '',
+            'last_name': '',
+            'domain': '',
+            'full_email': '',
+            'status': 'Pending'
         }
 
     # Access groups based on the updated regex
@@ -232,12 +252,17 @@ def extract_email_info_re(email_string):
             last_name = username_parts[-1]
         elif len(username_parts) == 1:
             first_name = username_parts[0]
-
+    
     return {
-        'first_name': first_name.title() if first_name else None,
-        'last_name': last_name.title() if last_name else None,
+        'first_name': first_name.title() if first_name else '',
+        'last_name': last_name.title() if last_name else '',
         'domain': domain,
-        'full_email': full_email
+        'full_email': full_email,
+        'email_draft': {
+            'subject' : '',
+            'body' : ''
+        },
+        'status':'Pending'
     }
 
 def important_links(soup, base_url):
@@ -290,7 +315,7 @@ def chat():
     if not query :
         return jsonify({"response": "Empty query received."})
     
-    print(str(domain))
+    
     system_prompt = get_bot_system_prompt(content=companies_info.get(domain, {}).get('content', ''))
     # Call Together.ai model
     try:
@@ -322,44 +347,254 @@ def get_bot_system_prompt(content):
 @app.route('/generate_email', methods=['POST'])
 def generate_email():
     data = request.get_json()
-    domain = data.get("domain").replace('\n', '').replace(' ', '')
-    companies_info = data.get("companies_info", {})
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip()
+    
+    try:
+        domain = session['info'][email]['domain']
+        summary = session['companies_info'].get(domain, {}).get('summary', '')
+        body_prompt = get_email_body_prompt(content=summary)
+        body = get_response_from_llm(prompt=body_prompt)
+        subject_prompt = get_email_subject_prompt(email_body=body)
+        subject = get_response_from_llm(prompt=subject_prompt)
+        return jsonify({'success': True, 'email' : {'body': body, 'subject': subject}})
+    
+    except Exception as e:
 
-    if not domain:
-        return jsonify({"email": "Invalid domain or missing info."})
-    prompt = get_email_system_prompt(content=companies_info.get(domain, {}).get('content', ''))
-    email = get_response_from_llm(prompt)
-    return jsonify({"email": markdown.markdown(email)})
+        return jsonify({'success': False, 'error': str(e)})
 
-def get_email_system_prompt(content):
+def get_email_body_prompt(content):
     """
     Function to get the system prompt for generating an email.
     This is a placeholder function and should be replaced with actual system prompt logic.
     """
-    prompt = f"""
+    body_prompt = f"""
     You are a lead generation and marketing assistant working for NetWit.ca — a company that provides growth and performance services including:
 
     Social Media Marketing
-  - SEO (Search Engine Optimization)
-  - Content Marketing
-  - Paid Marketing Services
-  - Outdoor Advertising
-  - Cloud Hosting (Shared, Managed, BulletProof VPS)
-  - PowerMTA, Email Warmup, Verification, and SMTP solutions
-  - WordPress Hosting, Guides, Infographics, and Whitepapers
+    SEO (Search Engine Optimization)
+    Content Marketing
+    Paid Marketing Services
+    Outdoor Advertising
+    Cloud Hosting (Shared, Managed, BulletProof VPS)
+    PowerMTA, Email Warmup, Verification, and SMTP solutions
+    WordPress Hosting, Guides, Infographics, and Whitepapers
 
-    You are tasked with writing a **highly personalized outreach email** to a company based on their scraped website text below. Parse and understand their business model, tone, and visible issues from the audit.
+    Here is more company_details : 
+
+    NetWit (NetWit Innovation Hub) is a Vancouver‑based Canadian digital marketing and lead generation agency 
+    that empowers businesses with strategic, tech‑driven solutions. As a Certified Google Ads Partner, they’ve 
+    supported over 1,000 companies in the last decade, offering services like SEO, Google Ads, social media marketing,
+    SMS/email campaigns, and CRM automation. Their philosophy emphasizes innovation, adaptability,
+    professionalism, and client‑centric collaboration, aiming for swift, high‑quality delivery through their “On 
+    Time Service” . Led by CEO Dhiraj Chatpar, NetWit operates Mon–Fri (10 am–6 pm), is located at 
+    Granville St, Vancouver, and can be reached via [sales@netwit.ca](mailto:sales@netwit.ca) or +1 604‑722‑9996.
+
+
+    You are tasked with writing a **highly personalized outreach email body only** behalf of Dave Chapter CEO of netwit.ca to a company based on their scraped website text
+    below. Parse and understand their business model, tone, and visible issues from the audit.
 
     Here is the web content of targeted company:
+
+
     {content[:29000]}
     """
 
-    return prompt
+    return body_prompt
+
+def get_email_subject_prompt(email_body):
+    """
+    Function to get the system prompt for generating an email subject.
+    This is a placeholder function and should be replaced with actual system prompt logic.
+    """
+    subject_prompt = f"""
+    You are a lead generation and marketing assistant working for NetWit.ca — a company that provides growth and performance services including:
+    Social Media Marketing
+    SEO (Search Engine Optimization)
+    Content Marketing
+    Paid Marketing Services
+    Outdoor Advertising
+    Cloud Hosting (Shared, Managed, BulletProof VPS)
+    PowerMTA, Email Warmup, Verification, and SMTP solutions
+    WordPress Hosting, Guides, Infographics, and Whitepapers
+
+    you are tasked with give a sigle shot subject for this email -
+    Here is email body:
+    {email_body}
+    """
+    return subject_prompt
 
 @app.route('/campaign')
 def campaign():
-    return render_template('campaign.html')
+    info = session.get('info', {})
+    companies_info = session.get('companies_info', {})
+    return render_template('campaign.html', info=info, domains=session.get('domains'), companies_info=companies_info)
 
+@app.route('/delete_leads', methods=['POST'])
+def delete_company():
+    data = request.get_json()
+    info = session.get('info', {})
+    emails = data.get('emails', [])
+
+    for email in emails:
+        if email in info:
+            del info[email]
+        else:
+            return jsonify({'success': False, 'error': f'Email {email} not found.'}), 404
+        
+    session['info'] = info
+    return jsonify({'success': True})
+
+@app.route('/save_draft', methods=['POST'])
+def save_draft():
+    data = request.get_json()
+    email = data.get('email')
+    subject = data.get('subject')
+    body = data.get('body')
+
+    if not email or not subject or not body:
+        return jsonify({'success': False, 'error': 'Missing email, subject, or body.'}), 400
+
+    info = session.get('info', {})
+    
+    if email in info:
+        info[email]['email_draft']['subject'] = subject
+        info[email]['email_draft']['body'] = body
+        session['info'] = info
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False, 'error': 'Email not found.'}), 404
+
+@app.route('/get_email_draft', methods=['POST'])
+def get_email_draft():
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'success': False, 'error': 'Email is required.'}), 400
+
+    info = session.get('info', {})
+    
+    if email in info:
+        draft = info[email]['email_draft']
+        return jsonify({'success': True, 'subject': draft['subject'], 'body': draft['body']})
+    
+    return jsonify({'success': False, 'error': 'Email not found.'}), 404
+
+@app.route('/send_email', methods=['POST'])
+def send_email():
+    data = request.get_json()
+    email = data.get('email')
+    
+    subject = session['info'][email]['email_draft']['subject'] 
+    body = session['info'][email]['email_draft']['body']
+
+    if not email or not subject or not body:
+        return jsonify({'success': False, 'error': 'Missing email, subject, or body.'}), 400
+
+    try:
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587
+        sender_email = 'kumarh18999@gmail.com'
+        sender_password = 'hkqt csvi zwhi jvyy'
+        receiver_email = email
+
+        massage = MIMEMultipart()
+        massage['From'] = sender_email
+        massage['To'] = receiver_email
+        massage['Subject'] = subject
+        massage.attach(MIMEText(body, 'plain'))
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, receiver_email, massage.as_string())
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+    return jsonify({'success': True, 'message': 'Email sent successfully.'})
+
+@app.route('/update_email_status', methods=['POST'])
+def update_email_status():
+    data = request.get_json()
+    email = data.get('email')
+    status = data.get('status')
+
+    if not email or not status:
+        return jsonify({'success': False, 'error': 'Missing email or status.'}), 400
+
+    info = session.get('info', {})
+    
+    if email in info:
+        info[email]['status'] = status
+        session['info'] = info
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False, 'error': 'Email not found.'}), 404
+
+@app.route('/send_bulk_emails', methods=['POST'])
+def send_bulk_emails():
+    data = request.get_json()
+    emails = data.get('emails')
+
+    if not emails or not isinstance(emails, list):
+        return jsonify({'success': False, 'error': 'Invalid email list.'}), 400
+
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    sender_email = 'kumarh18999@gmail.com'
+    sender_password = 'hkqt csvi zwhi jvyy'  
+
+    sent_count = 0
+    failed_count = 0
+    errors = {}
+
+    for email in emails:
+        try:
+            # Check if email draft info exists
+            if email not in session['info']:
+                errors[email] = 'No draft found'
+                failed_count += 1
+                continue
+
+            subject = session['info'][email]['email_draft'].get('subject')
+            body = session['info'][email]['email_draft'].get('body')
+
+            if not subject or not body:
+                errors[email] = 'Missing subject or body'
+                failed_count += 1
+                continue
+
+            # Compose email
+            msg = MIMEMultipart()
+            msg['From'] = sender_email
+            msg['To'] = email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(body, 'plain'))  # Use 'html' for formatted emails
+
+            # Send email
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls()
+                server.login(sender_email, sender_password)
+                server.sendmail(sender_email, email, msg.as_string())
+
+            sent_count += 1
+
+        except Exception as e:
+            errors[email] = str(e)
+            failed_count += 1
+
+    return jsonify({
+        'success': True,
+        'sent_count': sent_count,
+        'failed_count': failed_count,
+        'errors': errors if errors else None
+    })
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', info=session.get('info', {}), domains=session.get('domains', []), companies_info=session.get('companies_info', {}))
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 

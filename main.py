@@ -1,0 +1,29 @@
+from flask import Flask
+from flask_session import Session
+from config import Config
+from routes.auth_routes import auth_bp
+from routes.email_routes import email_bp
+from routes.file_routes import file_bp
+from routes.llm_routes import llm_bp
+from routes.other_routes import other_bp
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+    app.config['SESSION_TYPE'] = 'filesystem' 
+    # Initialize extensions
+    Session(app)
+    Config.init_app(app)
+    
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(email_bp)
+    app.register_blueprint(file_bp)
+    app.register_blueprint(llm_bp)
+    app.register_blueprint(other_bp)
+    
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True, host='0.0.0.0', port=5000)
