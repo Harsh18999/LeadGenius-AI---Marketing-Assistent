@@ -7,7 +7,8 @@ from routes.file_routes import file_bp
 from routes.llm_routes import llm_bp
 from routes.other_routes import other_bp
 import redis
-import os
+from config import Config
+
 
 def create_app():
     app = Flask(__name__)
@@ -20,7 +21,7 @@ def create_app():
     port=15273,
     decode_responses=False,
     username="default",
-    password=os.environ['REDIS_KEY],
+    password=Config.REDIS_KEY,
 )
     # Initialize extensions
     Session(app)
