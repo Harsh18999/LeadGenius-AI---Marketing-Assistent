@@ -11,7 +11,7 @@ class Config:
     SMTP_PORT = 587
     EMAIL_ADDRESS = 'kumarh18999@gmail.com'
     EMAIL_PASSWORD = os.environ['EMAIL_PASSWORD']
-    REDIS_KEY = os.environ['REDIS_KEY],
+    REDIS_KEY = os.environ['REDIS_KEY']
 
     @staticmethod
     def init_app(app):
