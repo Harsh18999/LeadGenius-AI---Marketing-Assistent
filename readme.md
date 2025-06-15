@@ -36,12 +36,12 @@ A Flask-based web application for lead generation, company research, and persona
 
 ## Project Structure
 
-LeadGenius-AI/
-├── app.py # Main application entry point
-├── config.py # Configuration settings
-├── requirements.txt # Python dependencies
-├── README.md # Project documentation
-├── routes/ # Flask route handlers
+ LeadGenius-AI/
+ ├── app.py # Main application entry point
+ ├── config.py # Configuration settings
+ ├── requirements.txt # Python dependencies
+ ├── README.md # Project documentation
+ ├── routes/ # Flask route handlers
 │ ├── init.py # Blueprint organization
 │ ├── auth_routes.py # Authentication routes
 │ ├── email_routes.py # Email related routes
