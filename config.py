@@ -3,7 +3,7 @@ import os
 class Config:
     SECRET_KEY = 'xyz'  # Keep this safe!
     SESSION_TYPE = 'filesystem'
-    UPLOAD_FOLDER = 'uploads'
+    UPLOAD_FOLDER = '/tmp/uploads''
     TOGETHER_API_KEY = os.environ['TOGETHER_API_KEY']
     
     # Email configuration
