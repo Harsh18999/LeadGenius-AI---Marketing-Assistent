@@ -19,7 +19,7 @@ def create_app():
     port=15273,
     decode_responses=False,
     username="default",
-    password=os.environ['REDIC_KEY],
+    password=os.environ['REDIS_KEY],
 )
     # Initialize extensions
     Session(app)
