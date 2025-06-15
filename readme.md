@@ -1,5 +1,3 @@
-# LeadGen Outreach Automation Tool
-
 A Flask-based web application for lead generation, company research, and personalized email outreach automation.
 
 ## Features
@@ -36,12 +34,31 @@ A Flask-based web application for lead generation, company research, and persona
 
 ## Project Structure
 
-├───routes  # Flask route handlers
-├───services   # Business logic and helpers
-├───static  # Static files (CSS, JS, images)
-├───templates  # HTML templates (Flask Jinja2)
-├───uploads # 
-
+```bash
+LeadGenius AI/
+├── app.py # Main application entry point
+├── config.py # Configuration settings
+├── requirements.txt # Python dependencies
+├── README.md # This file
+├── routes/
+│ ├── init.py # Blueprint organization
+│ ├── auth_routes.py # Authentication routes
+│ ├── email_routes.py # Email related routes
+│ ├── file_routes.py # File upload and processing routes
+│ ├── llm_routes.py # LLM interaction routes
+│ └── other_routes.py # other routes
+├── services/
+│ ├── init.py # Service exports
+│ ├── email_service.py # Email sending functionality
+│ ├── file_service.py # File processing functions
+│ ├── llm_service.py # LLM interaction functions
+│ └── web_scraper.py # Web scraping functions
+├── templates/ # Flask templates
+│ ├── index.html # Main page
+│ ├── dashboard.html # Lead dashboard
+│ └── campaign.html # Campaign management
+└── static/ # Static files (CSS, JS, images)
+```
 ## Usage Guide
 
 1. **Upload Leads**:
