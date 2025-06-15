@@ -10,4 +10,4 @@ email-validator==2.1.0.post1
 smtplib==0.0.1
 flask-debugtoolbar==0.13.1  # Debugging
 pytest==8.0.0  # Testing
-Gunicorn
+gunicorn
