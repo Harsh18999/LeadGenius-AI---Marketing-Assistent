@@ -25,7 +25,15 @@ def upload_file():
                 info, domains = get_details_from_dataframe(df)
                 session['info'] = info
                 session['domains'] = list(domains)
-                companies_info = {domain: {} for domain in domains}
+                companies_info = {}
+                for domain in domains:
+                    companies_info[domain] = {}
+                    companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
+                    summary = get_response_from_llm(
+                        prompt = get_summary_prompt(companies_info[domain]['content'])
+                    )
+                    companies_info[domain]['summary'] = markdown.markdown(summary)
+
                 session['companies_info'] = companies_info
                 return render_template('dashboard.html', info=info, domains=list(domains), companies_info=companies_info)
             
@@ -37,7 +45,11 @@ def upload_file():
                 for domain in domains:
                     companies_info[domain] = {}
                     companies_info[domain]['content'] = scrape_company_homepage(domain)['content']
-                
+                    summary = get_response_from_llm(
+                        prompt = get_summary_prompt(companies_info[domain]['content'])
+                    )
+                    companies_info[domain]['summary'] = markdown.markdown(summary)
+                    
                 session['info'] = info
                 session['domains'] = list(domains)
                 session['companies_info'] = companies_info
