@@ -96,22 +96,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 ```
-
-This README includes:
-
-1. **Comprehensive feature overview**
-2. **Clear installation instructions**
-3. **Detailed usage guide**
-4. **API endpoint documentation**
-5. **Customization options**
-6. **Troubleshooting section**
-7. **Project structure visualization**
-
-You may want to:
-- Add screenshots of the UI
-- Include a demo video link
-- Add specific version requirements
-- Include test instructions if you have tests
-- Add deployment instructions for different platforms
-
-Would you like me to add any additional sections or provide more detail in any particular area?
