@@ -14,6 +14,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.config['SESSION_TYPE'] = 'redis' 
+    app.config["SESSION_REFRESH_EACH_REQUEST"] = False
     app.config['SESSION_PERMANENT'] = False
     app.config['SESSION_USE_SIGNER'] = False
     app.config['SESSION_REDIS'] = redis.Redis(
