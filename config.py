@@ -16,6 +16,5 @@ class Config:
     @staticmethod
     def init_app(app):
         # Ensure the upload folder exists
-        app.config["SESSION_REFRESH_EACH_REQUEST"] = False
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
             os.makedirs(app.config['UPLOAD_FOLDER'])
