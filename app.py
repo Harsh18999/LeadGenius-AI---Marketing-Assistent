@@ -18,8 +18,8 @@ def create_app():
     app.config['SESSION_PERMANENT'] = False
     app.config['SESSION_USE_SIGNER'] = False
     app.config['SESSION_REDIS'] = redis.Redis(
-    host='redis-15273.c264.ap-south-1-1.ec2.redns.redis-cloud.com',
-    port=15273,
+    host='redis-19968.c301.ap-south-1-1.ec2.redns.redis-cloud.com',
+    port=19968,
     decode_responses=False,
     username="default",
     password=Config.REDIS_KEY,
